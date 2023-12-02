@@ -2,36 +2,45 @@ html {
   height: -webkit-fill-available;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+#listing::before,
+#readme::before {
+  content: "×";
+}
+
+input[type="radio"],
 .hidden {
   display: none;
 }
 
 body,
+#closeButton,
 .mapboxgl-popup-content {
   font-family: 'Rampart One', "游ゴシック体", "YuGothic", "游ゴシック Medium", "Yu Gothic Medium", "游ゴシック", "Yu Gothic", sans-serif;
 }
 
 #button {
   color: #000;
-  transition: 1s;
 }
 
-#listing #title,
+#title,
 #closeButton,
 .mapboxgl-popup-content,
-.mapboxgl-popup-close-button {
+.mapboxgl-popup-close-button,
+#listing::before {
   color: orange;
 }
 
-.label,
-.radio label {
+label {
   border: solid 1px orange;
   color: orange;
 }
 
 #button,
-.label:hover,
-.radio input[type=radio]:checked + label {
+input[type=radio]:checked + label {
   color: #fff;
   background: orange;
 }
@@ -42,14 +51,19 @@ body,
   background: #fff;
 }
 
-#close {
-  display: inline-block;
+#listing::before {
   font-size: 400%;
-  font-weight: 400;
-  padding: 0 0.25rem;
+  padding: 0 0.75rem;
+  margin: 0;
 }
 
-#readme::after {
+#button,
+button,
+label {
+  transition: 1s;
+}
+
+#readme::before {
   font-size: 250%;
 }
 
@@ -58,14 +72,14 @@ body,
   font-weight: 400;
 }
 
+.mapboxgl-popup-content,
+.mapboxgl-popup-close-button {
+  font-size: 150%;
+}
+
 #button,
 #closeButton {
   font-size: 125%;
-  font-weight: 400;
-}
-
-.mapboxgl-popup-content {
-  font-size: 111%;
 }
 
 #listing #title,
@@ -82,30 +96,49 @@ button {
 
 #button,
 button:hover,
-.marker:hover,
+.mapboxgl-marker:hover,
+.mapboxgl-popup-close-button:hover,
 #readme:hover {
   cursor: pointer;
 }
 
 body,
 #map,
-#listing #image,
-.mapboxgl-popup-content {
+#button,
+#closeButton {
   padding: 0;
   margin: 0;
 }
 
-#readme,
+label {
+  display: inline-block;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
 #listing #description,
-#button,
-.mapboxgl-popup-content p {
+#button {
   padding: 0.5rem;
 }
 
-#listing #title,
-#close,
-.mapboxgl-popup-content p {
+#listing #title {
   margin: 0.5rem;
+}
+
+#readme,
+.mapboxgl-popup-content {
+  padding: 1rem;
+}
+
+.mapboxgl-popup-close-button {
+  padding: 0 0.25rem;
+  margin: 0;
+}
+
+#listing::before {
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
 body {
@@ -114,24 +147,20 @@ body {
   max-height: -webkit-fill-available;
 }
 
-#button {
-  position: fixed;
-  top: 0;
-  left: 0;
-  margin: 0;
-  z-index: 1;
-}
-
-#map {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
+#button,
 #listing {
   position: fixed;
   top: 0;
+}
+
+#button {
+  left: 0;
+  z-index: 1;
+}
+
+#listing {
+  background-position: center;
+  background-size: contain;
   right: 0;
   width: calc(100% - 4rem);
   max-width: 750px;
@@ -139,14 +168,9 @@ body {
   overflow: auto;
 }
 
-#listing {
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.55)
-}
-
-#listing #title,
-#listing #image {
-  display: block;
+#map {
+  width: 100%;
+  height: 100%;
 }
 
 #listing #title {
@@ -160,31 +184,8 @@ body {
   z-index: 4;
 }
 
-#listing #image {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  float: right;
-  max-width: calc(100% - 4rem);
-  max-height: 100%;
-  z-index: 0;
-}
-
-#listing #description {
-  box-sizing: border-box;
-  clear: both;
-}
-
-#readme::after {
-  content: "×";
-  display: block;
-  margin: 1.25rem 0 0;
-  padding: 0;
-}
-
 #readme {
   border-radius: 0.4rem;
-  box-sizing: border-box;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -194,6 +195,14 @@ body {
   max-width: 750px;
   max-height: 75%;
   z-index: 10;
+}
+
+#readme::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 1rem;
+  margin: 0;
 }
 
 @media (orientation: landscape) {
@@ -209,7 +218,7 @@ body {
   }
 }
 
-.marker {
+.mapboxgl-marker {
   background: orange;
   border: 2px #fff solid;
   border-radius: 50%;

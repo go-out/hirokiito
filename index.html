@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no" />
+  <title>岡山県オススメ60スポット | イトウヒロキ</title>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+  <link href="style.css" rel="stylesheet" />
+  <link href="../css/menu.css" rel="stylesheet" />
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon-precomposed" href="icon.png" sizes="180x180" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rampart+One&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1 id="button">岡山県オススメ60スポット</h1>
+  <main id="map"></main>
+  <main id="listing" hidden>
+    <img id="image">
+    <h2 id="title"></h2>
+    <button id="close" type="button" onclick="ChangeHidden()">×</button>
+  </main>
+
+  <article id="readme"></article>
+
+  <dialog id="modal">
+    <b>カテゴリー</b>
+    <section class="org radio">
+      <input type="radio" name="tag" id="park" value="park">
+      <label for="park">公園・広場</label>
+      <input type="radio" name="tag" id="symbol" value="symbol">
+      <label for="symbol">モニュメント</label>
+      <input type="radio" name="tag" id="shop" value="shop">
+      <label for="shop">店</label>
+      <input type="radio" name="tag" id="strange" value="strange">
+      <label for="strange">?</label>
+      <input type="radio" name="tag" id="all" value="all" checked>
+      <label for="all">すべて表示</label>
+    </section>
+    <br/>
+    <b>エリア</b>
+    <section class="radio">
+      <input type="radio" name="area" id="okayama" value="okayama" onchange="area('133.91755925535443', '34.66585488942782', '13')">
+      <label for="okayama">岡山</label>
+      <input type="radio" name="area" id="kurashiki" value="kurashiki" onchange="area('133.76502244667', '34.60152254428738', '12')">
+      <label for="kurashiki">倉敷</label>
+      <input type="radio" name="area" id="soji" value="soji" onchange="area('133.73807636176213', '34.673461131699014', '12.5')">
+      <label for="soji">総社</label>
+      <input type="radio" name="area" id="bichu" value="bichu" onchange="area('133.82225215762105', '34.686473231398125', '15')">
+      <label for="bichu">備中高松</label>
+    </section>
+    <br/>
+    <button type="button" id="closeButton">閉じる</button>
+  </dialog>
+
+  <script src="geojson.js"></script>
+  <script type="text/javascript">
+  mapboxgl.accessToken = 'pk.eyJ1IjoicGVodSIsImEiOiJja3R4Y3diNmIybTg5Mm9waWgwYTdsc3FyIn0.lVvnPZ3aa6332EaWJIxPaQ';
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/outdoors-v12',
+    center: [133.91755925535443, 34.66585488942782],
+    zoom: 9
+  });
+  map.addControl(
+    new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true
+      },
+      // デバイスの位置の変更に応じて位置情報を更新
+      trackUserLocation: true,
+      // デバイスが向いている方向を矢印で描画
+      showUserHeading: true
+    })
+  );
+  map.addControl(new mapboxgl.NavigationControl());
+
+  const title = document.querySelector('#title'),
+  description = document.querySelector('#description'),
+  image = document.querySelector('#image');
+
+  // add markers to map
+  for (const marker of geojson.features) {
+    // create a HTML element for each feature
+    const el = document.createElement('div');
+    el.className = 'marker';
+    el.setAttribute('data-tag', marker.properties.tag)
+
+    // make a marker for each feature and add to the map
+    new mapboxgl.Marker(el)
+    .setLngLat(marker.geometry.coordinates)
+    .setPopup(
+      new mapboxgl.Popup({
+        offset: 12.5
+      })
+      .setHTML(
+        `
+        <p>${marker.properties.description}</p>
+        `
+      )
+    )
+    .addTo(map);
+    el.addEventListener('click', (e) => {
+      ChangeHidden()
+      title.innerText = marker.properties.title;
+      image.src = marker.properties.url
+      map.flyTo({
+        center: marker.geometry.coordinates,
+        zoom: 17.5
+      })
+    })
+  }
+
+  function area(lng = '', lat = '', zoom = '') {
+    map.flyTo({
+      center: [lng, lat],
+      zoom: zoom
+    })
+  }
+
+  const close = document.querySelector('#close');
+  close.addEventListener('click', (e) => {
+    map.flyTo({
+      zoom: 15.55
+    })
+  })
+
+  const readme = document.querySelector('#readme');
+  document.body.addEventListener('click', (e) => {
+    readme.remove()
+  })
+
+  fetch('README.md')
+  .then(response => response.text())
+  .then(innerText => {
+    readme.innerText = innerText;
+  });
+
+  function ChangeHidden() {
+    const mainAll = document.querySelectorAll('main');
+    mainAll.forEach(main => {
+      if (main.hidden == false) {
+        main.hidden = true;
+        main.style.pointerEvents = "none";
+        main.style.userSelect = "none";
+      } else {
+        main.hidden = false;
+        main.style.pointerEvents = "auto";
+        main.style.userSelect = "auto";
+      }
+    });
+  };
+
+  const dialogModal = document.querySelector('#modal');
+  const openModal = document.querySelector('#button');
+
+  openModal.addEventListener('click', function onModal() {
+    if (typeof dialogModal.showModal === "function") {
+      dialogModal.showModal();
+    } else {
+      alert("The dialog API is not supported by this browser");
+    }
+  });
+
+  const closeButton = document.querySelector('#closeButton');
+  closeButton.addEventListener('click', () => {
+    dialogModal.close();
+  });
+  </script>
+  <script src="../js/org.js"></script>
+</body>
+</html>

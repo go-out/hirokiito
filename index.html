@@ -89,7 +89,7 @@
 
   <dialog id="modal">
     <b>カテゴリー</b>
-    <section class="org">
+    <section id="org">
       <input type="radio" name="tag" id="park" value="park">
       <label for="park">公園・広場</label>
       <input type="radio" name="tag" id="symbol" value="symbol">
@@ -101,7 +101,7 @@
       <input type="radio" name="tag" id="all" value="all" checked>
       <label for="all">すべて表示</label>
     </section>
-    <br />
+    <br>
     <b>エリア</b>
     <section>
       <input type="radio" name="area" id="okayama" value="okayama"
@@ -201,6 +201,29 @@
         listing.style.userSelect = "auto";
       }
     };
+
+    let targets = document.querySelectorAll(".mapboxgl-marker")
+    let filter = document.querySelectorAll("#org input")
+    
+    if (filter) {
+      //****** for all select ******
+      for (let i of filter) {
+        i.addEventListener('change', () => {
+          //*** for each target ***
+          for (let ii of targets) {
+            //*** delete hidden class ***
+            ii.classList.remove('hidden')
+            let value = i.value
+            let name = i.getAttribute('name')
+            let item_data = ii.getAttribute('data-' + name)
+            //*** set hidden class ***
+            if (value && value !== 'all' && value !== item_data && !ii.classList.contains('hidden')) {
+              ii.classList.add('hidden')
+            }
+          }
+        });
+      }
+    }
   </script>
 </body>
 

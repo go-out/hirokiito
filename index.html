@@ -5,60 +5,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="format-detection" content="telephone=no" />
-  <script>
-    document.addEventListener("readystatechange", (event) => {
-      if (event.target.readyState === "interactive") {
-        const dialogModal = document.querySelector('#modal');
-        const openButton = document.querySelector('#button');
-        const closeButton = document.querySelector('#closeButton');
 
-        openButton.addEventListener('click', () => {
-          if (typeof dialogModal.showModal === "function") {
-            dialogModal.showModal();
-          } else {
-            alert("The dialog API is not supported by this browser");
-          }
-        });
-
-        closeButton.addEventListener('click', () => {
-          dialogModal.close();
-        });
-      } else if (event.target.readyState === "complete") {
-        const readme = document.querySelector('#readme');
-        fetch('README.md')
-          .then(response => response.text())
-          .then(innerText => {
-            readme.innerText = innerText;
-          });
-        readme.addEventListener('click', () => {
-          readme.remove()
-        })
-
-        let targets = document.querySelectorAll(".mapboxgl-marker")
-        let filter = document.querySelectorAll("#org input")
-        
-        if (filter) {
-          //****** for all select ******
-          for (let i of filter) {
-            i.addEventListener('change', () => {
-              //*** for each target ***
-              for (let ii of targets) {
-                //*** delete hidden class ***
-                ii.classList.remove('hidden')
-                let value = i.value
-                let name = i.getAttribute('name')
-                let item_data = ii.getAttribute('data-' + name)
-                //*** set hidden class ***
-                if (value && value !== 'all' && value !== item_data && !ii.classList.contains('hidden')) {
-                  ii.classList.add('hidden')
-                }
-              }
-            });
-          }
-        }
-      }
-    });
-  </script>
+  <!-- Favicons and friends -->
+  <link href="./image.jpg" rel="icon" type="image/png">
+  <link href="./image.jpg" rel="shortcut icon">
 
   <!--og:meta-->
   <meta content="website" property="og:type">
@@ -75,57 +25,29 @@
   <meta content="https://go-out.github.io/hirokiito/card.png" property="og:image">
   <meta content="https://go-out.github.io/hirokiito/card.png" name="twitter:image:src">
 
-  <!-- Favicons and friends -->
-  <meta name="msapplication-TileColor" content="#fff">
-  <meta name="msapplication-config" content="">
-  <meta name="theme-color" content="#fff">
-  <link href="https://creative-community.space/map/profile/img/favicon.png" rel="icon" type="image/png">
-  <link href="https://creative-community.space/map/profile/img/favicon.png" rel="shortcut icon">
-  <link rel="manifest" href="">
-  <link rel="mask-icon" href="" color="#fff">
-
-  <!-- Show app banner on iOS -->
-  <meta name="apple-itunes-app" content="">
-
-  <!-- Mapbox -->
-  <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
-  <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
-
   <link href="index.css" rel="stylesheet" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rampart+One&display=swap" rel="stylesheet">
+
+  <!-- Mapbox -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
 </head>
 
 <body>
-  <h1 id="button">岡山県オススメ60スポット</h1>
+  <h1>岡山県オススメ60スポット</h1>
 
-  <article id="readme"></article>
+  <dialog id="modal">
+    <h2>イトウヒロキ</h2>
+    <button type="button">×</button>
+  </dialog>
 
   <main id="map"></main>
 
-  <main id="listing" hidden>
-    <h2 id="title"></h2>
-  </main>
-
-  <dialog id="modal">
-    <b>カテゴリー</b>
-    <section id="org">
-      <input type="radio" name="tag" id="park" value="park">
-      <label for="park">公園・広場</label>
-      <input type="radio" name="tag" id="symbol" value="symbol">
-      <label for="symbol">モニュメント</label>
-      <input type="radio" name="tag" id="shop" value="shop">
-      <label for="shop">店</label>
-      <input type="radio" name="tag" id="strange" value="strange">
-      <label for="strange">?</label>
-      <input type="radio" name="tag" id="all" value="all" checked>
-      <label for="all">すべて表示</label>
-    </section>
-    <br>
-    <b>エリア</b>
-    <section>
+  <nav>
+    <fieldset>
+      <legend>エリア</legend>
       <input type="radio" name="area" id="okayama" value="okayama"
         onchange="area('133.91755925535443', '34.66585488942782', '13')">
       <label for="okayama">岡山</label>
@@ -138,97 +60,74 @@
       <input type="radio" name="area" id="bichu" value="bichu"
         onchange="area('133.82225215762105', '34.686473231398125', '15')">
       <label for="bichu">備中高松</label>
-    </section>
-    <br />
-    <button type="button" id="closeButton">閉じる</button>
-  </dialog>
+    </fieldset>
+    <fieldset id="org">
+      <legend>カテゴリー</legend>
+      <input type="radio" name="tag" id="park" value="park">
+      <label for="park">公園・広場</label>
+      <input type="radio" name="tag" id="symbol" value="symbol">
+      <label for="symbol">モニュメント</label>
+      <input type="radio" name="tag" id="shop" value="shop">
+      <label for="shop">店</label>
+      <input type="radio" name="tag" id="strange" value="strange">
+      <label for="strange">?</label>
+      <input type="radio" name="tag" id="all" value="all" checked>
+      <label for="all">すべて表示</label>
+    </fieldset>
+  </nav>
+
+  <article id="readme"></article>
 
   <script src="index.js"></script>
+  <script src="mapbox.js"></script>
   <script type="text/javascript">
-    mapboxgl.accessToken = 'pk.eyJ1IjoicGVodSIsImEiOiJja3R4Y3diNmIybTg5Mm9waWgwYTdsc3FyIn0.lVvnPZ3aa6332EaWJIxPaQ';
-    const bounds = [
-      [133.45602621929396, 34.435535758195286], // 南西座標
-      [134.24846498125743, 34.85230319814957] // 北東座標
-    ];
-    
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/outdoors-v12',
-      center: [133.91755925535443, 34.66585488942782],
-      zoom: 9,
-      maxBounds: bounds
+    document.addEventListener("readystatechange", (event) => {
+      if (event.target.readyState === "interactive") {
+        const closeButton = document.querySelector('#modal');
+        closeButton.addEventListener('click', () => {
+          closeButton.style.backgroundImage = 'url()';
+          closeButton.close();
+          map.flyTo({
+            zoom: 15.55
+          });
+        });
+      } else if (event.target.readyState === "complete") {
+        const readme = document.querySelector('#readme');
+        fetch('README.md')
+          .then(response => response.text())
+          .then(innerText => {
+            readme.innerText = innerText;
+          });
+        readme.addEventListener('click', () => {
+          readme.hidden = true;
+        });
+        document.querySelector('h1').addEventListener('click', () => {
+          readme.hidden = false;
+        });
+
+        let targets = document.querySelectorAll(".mapboxgl-marker");
+        let filter = document.querySelectorAll("#org input");
+        if (filter) {
+          //****** for all select ******
+          for (let i of filter) {
+            i.addEventListener('change', () => {
+              //*** for each target ***
+              for (let ii of targets) {
+                //*** delete hidden class ***
+                ii.classList.remove('hidden');
+                let value = i.value;
+                let name = i.getAttribute('name');
+                let item_data = ii.getAttribute('data-' + name);
+                //*** set hidden class ***
+                if (value && value !== 'all' && value !== item_data && !ii.classList.contains('hidden')) {
+                  ii.classList.add('hidden');
+                };
+              };
+            });
+          };
+        };
+      };
     });
-
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true
-        },
-        // デバイスの位置の変更に応じて位置情報を更新
-        trackUserLocation: true,
-        // デバイスが向いている方向を矢印で描画
-        showUserHeading: true
-      })
-    );
-    map.addControl(new mapboxgl.NavigationControl());
-
-    function area(lng = '', lat = '', zoom = '') {
-      map.flyTo({
-        center: [lng, lat],
-        zoom: zoom
-      })
-    }
-
-    const title = document.querySelector('#title'),
-      listing = document.querySelector('#listing');
-
-    // add markers to map
-    for (const marker of geojson.features) {
-      // create a HTML element for each feature
-      const el = document.createElement('div');
-      el.setAttribute('data-tag', marker.properties.tag)
-
-      // make a marker for each feature and add to the map
-      new mapboxgl.Marker(el)
-        .setLngLat(marker.geometry.coordinates)
-        .setPopup(
-          new mapboxgl.Popup({
-            offset: 12.5
-          })
-            .setHTML(marker.properties.description)
-        )
-        .addTo(map);
-      el.addEventListener('click', () => {
-
-        title.innerText = marker.properties.title;
-        listing.style.backgroundImage = 'url(' + marker.properties.url + ')'
-
-        map.flyTo({
-          center: marker.geometry.coordinates,
-          zoom: 17.5
-        })
-        changeHidden()
-      })
-    }
-
-    listing.addEventListener('click', () => {
-      map.flyTo({
-        zoom: 15.55
-      })
-      changeHidden()
-    })
-
-    function changeHidden() {
-      if (listing.hidden == false) {
-        listing.hidden = true;
-        listing.style.pointerEvents = "none";
-        listing.style.userSelect = "none";
-      } else {
-        listing.hidden = false;
-        listing.style.pointerEvents = "auto";
-        listing.style.userSelect = "auto";
-      }
-    };
   </script>
 </body>
 
